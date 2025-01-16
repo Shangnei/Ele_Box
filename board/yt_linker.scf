@@ -1,0 +1,198 @@
+/*
+ *  Copyright 2020-2024 Yuntu Microelectronics co.,ltd
+ *  All rights reserved.
+ * 
+ *  YUNTU Confidential. This software is owned or controlled by YUNTU and may only be
+ *  used strictly in accordance with the applicable license terms. By expressly
+ *  accepting such terms or by downloading, installing, activating and/or otherwise
+ *  using the software, you are agreeing that you have read, and that you agree to
+ *  comply with and are bound by, such license terms. If you do not agree to be
+ *  bound by the applicable license terms, then you may not retain, install,
+ *  activate or otherwise use the software. The production use license in
+ *  Section 2.3 is expressly granted for this software.
+ * 
+ * @file yt_linker.scf
+ * @brief 
+ * 
+ */
+
+
+
+LR_IVT_0 0x0
+{
+
+        IVT_start 0x0 FIXED EMPTY 0
+        {
+        }
+        isr_vector_region_start +0 FIXED EMPTY 0
+        {
+        }
+        isr_vector_region +0 NOCOMPRESS
+        {
+                *(.isr_vector)
+        }
+        isr_vector_region_end +0  EMPTY 0
+        {
+        }
+        IVT_end +0 EMPTY 0
+        {
+        }
+}
+ScatterAssert(ImageLength(LR_IVT_0) <= 1024)
+
+LR_TEXT_0 0x400
+{
+
+        TEXT_start 0x400 FIXED EMPTY 0
+        {
+        }
+        text_region_start +0 FIXED EMPTY 0
+        {
+        }
+        text_region +0 NOCOMPRESS
+        {
+                *(.text*)
+        }
+        text_region_end +0  EMPTY 0
+        {
+        }
+        rodata_region_start +0 FIXED EMPTY 0
+        {
+        }
+        rodata_region +0 NOCOMPRESS
+        {
+                *(.rodata*)
+        }
+        rodata_region_end +0  EMPTY 0
+        {
+        }
+        i_region_start +0 FIXED EMPTY 0
+        {
+        }
+        i_region +0 NOCOMPRESS
+        {
+                *(i*)
+        }
+        i_region_end +0  EMPTY 0
+        {
+        }
+        TEXT_end +0 EMPTY 0
+        {
+        }
+
+        ARM_start +0 FIXED EMPTY 0
+        {
+        }
+        ARM.exidx_region_start +0 FIXED EMPTY 0
+        {
+        }
+        ARM.exidx_region +0 NOCOMPRESS
+        {
+                *(.ARM.exidx*)
+        }
+        ARM.exidx_region_end +0  EMPTY 0
+        {
+        }
+        ARM_end +0 EMPTY 0
+        {
+        }
+}
+ScatterAssert(ImageLength(LR_TEXT_0) <= 0x1FC00)
+
+LR_IVT_RAM_0 0x20000000
+{
+
+        IVT_RAM_start AlignExpr(+0,1024)  EMPTY 0
+        {
+        }
+        IVT_RAM AlignExpr(+0,1024) EMPTY 0X400
+        {
+        }
+        IVT_RAM_end +0 EMPTY 0
+        {
+        }
+}
+ScatterAssert(ImageLength(LR_IVT_RAM_0) <= 0x400)
+
+LR_STACK_0 0x20003c00
+{
+
+        STACK_start +0  EMPTY 0
+        {
+        }
+        STACK +0 EMPTY 1024
+        {
+        }
+        STACK_end +0 EMPTY 0
+        {
+        }
+}
+ScatterAssert(ImageLength(LR_STACK_0) <= 1024)
+
+LR_RAM_0 0x20000400
+{
+
+        BSS_start +0  EMPTY 0
+        {
+        }
+        bss_region_start +0  EMPTY 0
+        {
+        }
+        bss_region +0 NOCOMPRESS
+        {
+                *(.bss*)
+        }
+        bss_region_end +0  EMPTY 0
+        {
+        }
+        BSS_end +0 EMPTY 0
+        {
+        }
+}
+ScatterAssert(ImageLength(LR_RAM_0) <= 0x3800)
+
+LR_TEXT_1 0x400 + ImageLength(LR_TEXT_0)
+{
+
+        CODE_RAM_start AlignExpr(ImageLimit(BSS_end),4)  EMPTY 0
+        {
+        }
+        code_ram_region_start AlignExpr(+0,4)  EMPTY 0
+        {
+        }
+        code_ram_region +0 NOCOMPRESS
+        {
+                *(.code_ram)
+        }
+        code_ram_region_end +0  EMPTY 0
+        {
+        }
+        CODE_RAM_end +0 EMPTY 0
+        {
+        }
+}
+ScatterAssert( 0x1FC00 >= (0 + ImageLength(LR_TEXT_0)))
+ScatterAssert(ImageLength(LR_TEXT_1) <= 0x1FC00-(0 + ImageLength(LR_TEXT_0)))
+
+LR_TEXT_2 0x400 + ImageLength(LR_TEXT_0) + ImageLength(LR_TEXT_1)
+{
+
+        DATA_RAM_start AlignExpr(ImageLimit(CODE_RAM_end),4)  EMPTY 0
+        {
+        }
+        data_region_start +0  EMPTY 0
+        {
+        }
+        data_region +0 NOCOMPRESS
+        {
+                *(.data*)
+        }
+        data_region_end +0  EMPTY 0
+        {
+        }
+        DATA_RAM_end +0 EMPTY 0
+        {
+        }
+}
+ScatterAssert( 0x1FC00 >= (0 + ImageLength(LR_TEXT_0) + ImageLength(LR_TEXT_1)))
+ScatterAssert(ImageLength(LR_TEXT_2) <= 0x1FC00-(0 + ImageLength(LR_TEXT_0) + ImageLength(LR_TEXT_1)))
